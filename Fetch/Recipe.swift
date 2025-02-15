@@ -22,7 +22,7 @@ import Foundation
 
 /// The Main Recipe object to be displayed in the app
 ///
-struct Recipe: Identifiable {
+struct Recipe: Identifiable, Codable {
     
     let cuisine: String
     let name: String
