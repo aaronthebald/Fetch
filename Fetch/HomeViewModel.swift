@@ -15,7 +15,9 @@ class HomeViewModel: ObservableObject {
     func fetchRecipes() async {
         do {
             let returnedRecipes = try await dataService.fetchAllRecipes()
-            recipes = returnedRecipes
+            await MainActor.run {
+                recipes = returnedRecipes
+            }
         } catch  {
             print(error)
         }

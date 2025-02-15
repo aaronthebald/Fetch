@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+protocol RecipeDataServiceProtocol {
+    func fetchAllRecipes() async throws -> [Recipe]
+    func getAllRecipesURL() throws -> URL
+}

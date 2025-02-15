@@ -7,12 +7,12 @@
 
 import Foundation
 
-class RecipeDataService {
+class RecipeDataService: RecipeDataServiceProtocol {
     
     private let urlString = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
     private let jsonDecoder = JSONDecoder()
     
-    private func getAllRecipesURL() throws -> URL {
+    func getAllRecipesURL() throws -> URL {
         guard let url = URL(string: urlString) else {
             print("Failed to create url from urlString: \(urlString)")
             throw RecipeDataServiceErrors.failedToCreateURL
