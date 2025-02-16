@@ -20,6 +20,14 @@ class RecipeDataService: RecipeDataServiceProtocol {
         return url
     }
     
+    func getImageURL(imageURL: String) throws -> URL {
+        guard let url = URL(string: imageURL) else {
+            print("Failed to create url from imageURL: \(imageURL)")
+            throw RecipeDataServiceErrors.failedToCreateURL
+        }
+        return url
+    }
+    
     func fetchAllRecipes() async throws -> [Recipe] {
         
         do {
@@ -38,6 +46,20 @@ class RecipeDataService: RecipeDataServiceProtocol {
             throw error
         }
         
+    }
+    
+    func getImageData(imageURL: String) async throws -> Data {
+        do {
+            let url = try getImageURL(imageURL: imageURL)
+            let (data, responseCode) = try await URLSession.shared.data(from: url)
+            guard (responseCode as? HTTPURLResponse)?.statusCode == 200 else {
+                print("The response code from the server was invalid")
+                throw RecipeDataServiceErrors.invalidResponseCode
+            }
+            return data
+        } catch {
+            throw error
+        }
     }
     
     enum RecipeDataServiceErrors: Error {
