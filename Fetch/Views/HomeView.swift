@@ -9,19 +9,24 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject var vm = HomeViewModel(dataService: RecipeDataService(), cacheService: CacheService())
+
     var body: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(vm.recipes) { recipe in
-                    RecipeTile(vm: vm, recipe: recipe)
-                        .frame(width: 300, height: 300)
-                }
-            }
+        NavigationStack {
+            List(vm.recipes, rowContent: { recipe in
+                RecipeTile(vm: vm, recipe: recipe)
+                    .listRowSeparator(.hidden)
+
+            })
+            .listRowSpacing(10)
+            .listStyle(.plain)
             
-        }
-        .padding()
-        .task {
-            await vm.fetchRecipes()
+            .refreshable {
+                await vm.fetchRecipes()
+            }
+            .task {
+                await vm.fetchRecipes()
+            }
+            .navigationTitle("Fetch Take-Home")
         }
     }
 }

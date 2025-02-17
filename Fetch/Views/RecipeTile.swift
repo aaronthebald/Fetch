@@ -19,7 +19,7 @@ struct RecipeTile: View {
             VStack(alignment: .leading) {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .aspectRatio(contentMode: .fill)
                     .overlay(alignment: .topLeading) {
                         Text(recipe.cuisine)
                             .padding(4)
@@ -30,15 +30,14 @@ struct RecipeTile: View {
                                 
                             }
                     }
-                Text(recipe.name)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                infoSection
             }
-            .frame(width: 250, height: 250)
-            
         } else if failedToLoad {
             VStack(alignment: .leading) {
                 Image(systemName: "photo.badge.exclamationmark")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .aspectRatio(contentMode: .fill)
                     .overlay(alignment: .topLeading) {
                         Text(recipe.cuisine)
                             .padding(4)
@@ -49,25 +48,59 @@ struct RecipeTile: View {
                                 
                             }
                     }
-                Text(recipe.name)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                
+                infoSection
             }
-            .frame(width: 250, height: 250)
         } else {
             ProgressView()
-                .task {
-                    do {
-                        let data = try await vm.fetchImageData(imageURL:  recipe.photoURLLarge ?? "", name: recipe.name)
-                        uiImage = UIImage(data: data)
-                    } catch {
-                        print("does the catch block run?")
-                        failedToLoad = true
-                    }
-                    
+                .onAppear {
+                    loadImage()
                 }
         }
     }
+
 }
 
 #Preview {
     RecipeTile(vm: HomeViewModel(dataService: RecipeDataService(), cacheService: CacheService()), recipe: Recipe(cuisine: "American", name: "Banana Pancakes", id: UUID().uuidString, photoURLLarge: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/large.jpg", photoURLSmall: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/small.jpg", sourceURL: "https://www.bbcgoodfood.com/recipes/banana-pancakes", youtubeURL: "https://www.youtube.com/watch?v=kSKtb2Sv-_U"), data: nil)
+}
+
+extension RecipeTile {
+    var infoSection: some View {
+        HStack(alignment: .top) {
+            Text(recipe.name)
+            Spacer()
+#warning("These need to be implemented safely!")
+            if let youtubeURL = recipe.youtubeURL {
+                Link(destination: URL(string: youtubeURL)!) {
+                    Image(systemName: "play.tv")
+                        .foregroundStyle(.red)
+                }
+                .buttonStyle(.plain)
+
+            }
+#warning("These need to be implemented safely!")
+            if let sourceURL = recipe.sourceURL {
+                Link(destination: URL(string: sourceURL)!) {
+                    Image(systemName: "globe")
+                        .foregroundStyle(.blue)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .font(.title)
+    }
+    
+    func loadImage() {
+        Task  {
+            do {
+                let data = try await vm.fetchImageData(imageURL:  recipe.photoURLLarge ?? "", name: recipe.name)
+                uiImage = UIImage(data: data)
+            } catch {
+                print("does the catch block run?")
+                failedToLoad = true
+            }
+        }
+    }
 }
