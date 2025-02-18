@@ -9,6 +9,9 @@ import Foundation
 
 class HomeViewModel: ObservableObject {
     @Published var recipes: [Recipe] = []
+    @Published var showAlert: Bool = false
+    @Published var alertMessage: String = ""
+    @Published var showEmptyView: Bool = false
     
     init(dataService: RecipeDataServiceProtocol, cacheService: CacheServiceProtocol) {
         self.dataService = dataService
@@ -23,17 +26,25 @@ class HomeViewModel: ObservableObject {
         do {
             let returnedRecipes = try await dataService.fetchAllRecipes()
             await MainActor.run {
-                recipes = returnedRecipes
+                if returnedRecipes.isEmpty {
+                    showEmptyView = true
+                } else {
+                    recipes = returnedRecipes
+                }
             }
         } catch  {
             print(error)
+//            I want to make custom errors and alerts for various situations
+            await MainActor.run {
+                alertMessage = error.localizedDescription
+                showAlert = true
+            }
         }
     }
     
     func fetchImageData(imageURL: String, name: String) async throws -> Data {
         guard let data = cacheService.getImage(imageURL: imageURL) else {
             do {
-                print("Downloading image for \(name)")
                 let data = try await dataService.getImageData(imageURL: imageURL)
                 cacheService.addImage(imageData: NSData(data: data), imageURL: imageURL)
                 return data
@@ -41,7 +52,6 @@ class HomeViewModel: ObservableObject {
                 throw error
             }
         }
-        print("data for \(name) was in the cache")
         return Data(data)
     }
     
