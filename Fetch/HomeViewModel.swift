@@ -33,8 +33,6 @@ class HomeViewModel: ObservableObject {
                 }
             }
         } catch  {
-            print(error)
-//            I want to make custom errors and alerts for various situations
             await MainActor.run {
                 alertMessage = error.localizedDescription
                 showAlert = true

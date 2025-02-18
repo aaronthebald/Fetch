@@ -8,25 +8,13 @@
 import Foundation
 
 class RecipeDataService: RecipeDataServiceProtocol {
-    
     private let urlString = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
+    private let urlStringWithError = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-"
+    private let urlStringWithEmptyResults = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json"
     private let jsonDecoder = JSONDecoder()
     
-    func getAllRecipesURL() throws -> URL {
-        guard let url = URL(string: urlString) else {
-            print("Failed to create url from urlString: \(urlString)")
-            throw RecipeDataServiceErrors.failedToCreateURL
-        }
-        return url
-    }
+    var testingStatus: TestingStatus = .functional
     
-    func getImageURL(imageURL: String) throws -> URL {
-        guard let url = URL(string: imageURL) else {
-            print("Failed to create url from imageURL: \(imageURL)")
-            throw RecipeDataServiceErrors.failedToCreateURL
-        }
-        return url
-    }
     
     func fetchAllRecipes() async throws -> [Recipe] {
         
@@ -62,9 +50,60 @@ class RecipeDataService: RecipeDataServiceProtocol {
         }
     }
     
+    func getAllRecipesURL() throws -> URL {
+        let urlString = getAllRecipesURLString()
+        guard let url = URL(string: urlString) else {
+            print("Failed to create url from urlString: \(urlString)")
+            throw RecipeDataServiceErrors.failedToCreateURL
+        }
+        return url
+    }
+    
+    func getImageURL(imageURL: String) throws -> URL {
+        let urlString = getImageURLString(urlString: imageURL)
+        guard let url = URL(string: urlString) else {
+            print("Failed to create url from imageURL: \(urlString)")
+            throw RecipeDataServiceErrors.failedToCreateURL
+        }
+        return url
+    }
+    
+    func getAllRecipesURLString() -> String {
+        switch testingStatus {
+        case .functional:
+            return urlString
+        case .returnError:
+            return urlStringWithError
+        case .returnEmpty:
+            return urlStringWithEmptyResults
+        case .returnInvalidURL:
+            return ""
+        }
+    }
+    
+    func getImageURLString(urlString: String) -> String {
+        switch testingStatus {
+        case .functional:
+            return urlString
+        case .returnError:
+            return urlString
+        case .returnEmpty:
+            return urlString
+        case .returnInvalidURL:
+            return ""
+        }
+    }
+    
     enum RecipeDataServiceErrors: Error {
         case failedToCreateURL
         case invalidResponseCode
+    }
+    
+    enum TestingStatus {
+        case functional
+        case returnError
+        case returnEmpty
+        case returnInvalidURL
     }
     
 }

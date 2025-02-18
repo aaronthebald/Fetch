@@ -98,7 +98,6 @@ extension RecipeTile {
                 let data = try await vm.fetchImageData(imageURL:  recipe.photoURLLarge ?? "", name: recipe.name)
                 uiImage = UIImage(data: data)
             } catch {
-                print("does the catch block run?")
                 failedToLoad = true
             }
         }
