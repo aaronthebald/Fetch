@@ -9,21 +9,25 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject var vm = HomeViewModel(dataService: RecipeDataService(), cacheService: CacheService())
-
+    
     var body: some View {
         NavigationStack {
             if vm.showEmptyView {
-                VStack {
-                    Text("😕 No Recipes were found")
+                if #available(iOS 17, *) {
+                    ContentUnavailableView("No recipes found", systemImage: "note.text")
+                } else {
+                    VStack {
+                        Text("No Recipes were found")
+                        Image(systemName: "note.text")
+                    }
                 }
-                .navigationTitle("Fetch Take-Home")
             } else {
                 List(vm.recipes, rowContent: { recipe in
                     RecipeTile(vm: vm, recipe: recipe)
                         .listRowSeparator(.hidden)
-                    
+                        .shadow(radius: 6, y: 6)
                 })
-                .listRowSpacing(10)
+                .listRowSpacing(15)
                 .listStyle(.plain)
                 
                 .refreshable {
@@ -44,16 +48,10 @@ struct HomeView: View {
                     Text("There was an error fetching your recipes.")
                 }
             }
-            
-            
         }
     }
 }
 
 #Preview {
     HomeView()
-}
-
-extension HomeView {
-    
 }
