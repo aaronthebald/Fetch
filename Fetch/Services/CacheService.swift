@@ -13,7 +13,7 @@ protocol CacheServiceProtocol {
     func getImage(imageURL: String) -> NSData?
 }
 
-class CacheService: ObservableObject, CacheServiceProtocol {
+class CacheService: CacheServiceProtocol {
     
     deinit {
         imageCache.removeAllObjects()
@@ -22,7 +22,7 @@ class CacheService: ObservableObject, CacheServiceProtocol {
     var imageCache: NSCache<NSString, NSData> = {
         let cache = NSCache<NSString, NSData>()
          cache.countLimit = 50
-         cache.totalCostLimit = 1024 * 1024 * 100
+         cache.totalCostLimit = 1024 * 1024 * 50
          return cache
     }()
     

@@ -10,33 +10,32 @@ import Testing
 
 struct RecipeDataServiceTests {
     
-    var dataService = RecipeDataService()
     
     
     @Test func dataServiceReturnsArrayOfRecipe() async throws {
+        let dataService = RecipeDataService(urlString: Constants.functionalURLString)
         let returnedData = try await dataService.fetchAllRecipes()
         #expect(!returnedData.isEmpty)
     }
     
     @Test func dataServiceThrowsInvalidResponseError() async throws {
-        dataService.testingStatus = .returnError
-        await #expect(throws: RecipeDataService.RecipeDataServiceErrors.invalidResponseCode, performing: {
+        let dataService = RecipeDataService(urlString: Constants.urlStringWithError)
+        await #expect(throws: RecipeDataServiceErrors.invalidResponseCode, performing: {
             let _ = try await dataService.fetchAllRecipes()
         })
     }
     
     @Test func dataServiceThrowsFailedToCreateError() async throws {
-        
-        dataService.testingStatus = .returnInvalidURL
-        
-        #expect(throws: RecipeDataService.RecipeDataServiceErrors.failedToCreateURL, performing: {
+        let dataService = RecipeDataService(urlString: Constants.cannotCreateURLString)
+        #expect(throws: RecipeDataServiceErrors.failedToCreateURL, performing: {
             try dataService.getAllRecipesURL()
         })
         
     }
     
     @Test func dataServiceGetImageDataReturnsData() async throws {
-        dataService.testingStatus = .functional
+        let dataService = RecipeDataService(urlString: Constants.functionalURLString)
+
         let urlString = "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/large.jpg"
         
         let data = try await dataService.getImageData(imageURL: urlString)
@@ -45,10 +44,10 @@ struct RecipeDataServiceTests {
     }
     
     @Test func dataServiceGetImageDataThrowsBadURLError() async throws {
-        dataService.testingStatus = .functional
+        let dataService = RecipeDataService(urlString: Constants.functionalURLString)
         let urlString = ""
         
-        await #expect(throws: RecipeDataService.RecipeDataServiceErrors.failedToCreateURL, performing: {
+        await #expect(throws: RecipeDataServiceErrors.failedToCreateURL, performing: {
             try await dataService.getImageData(imageURL: urlString)
 
         })

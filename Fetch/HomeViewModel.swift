@@ -8,10 +8,10 @@
 import Foundation
 
 class HomeViewModel: ObservableObject {
-    @Published var recipes: [Recipe] = []
+    @Published private(set) var recipes: [Recipe] = []
     @Published var showAlert: Bool = false
-    @Published var alertMessage: String = ""
-    @Published var showEmptyView: Bool = false
+    @Published private(set) var alertMessage: String = ""
+    @Published private(set) var showEmptyResultsView: Bool = false
     
     init(dataService: RecipeDataServiceProtocol, cacheService: CacheServiceProtocol) {
         self.dataService = dataService
@@ -27,7 +27,7 @@ class HomeViewModel: ObservableObject {
             let returnedRecipes = try await dataService.fetchAllRecipes()
             await MainActor.run {
                 if returnedRecipes.isEmpty {
-                    showEmptyView = true
+                    showEmptyResultsView = true
                 } else {
                     recipes = returnedRecipes
                 }

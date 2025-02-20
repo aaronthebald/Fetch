@@ -10,38 +10,37 @@ import Testing
 
 struct HomeViewModelTests {
 
-    let dataService = RecipeDataService()
     
     @Test func showAlertIsTrue() async {
-        dataService.testingStatus = .returnError
+        let dataService = RecipeDataService(urlString: Constants.urlStringWithError)
         let vm = HomeViewModel(dataService: dataService, cacheService: CacheService())
         await vm.fetchRecipes()
         #expect(vm.showAlert == true)
     }
     
     @Test func showAlertIsFalse() async {
-        dataService.testingStatus = .functional
+        let dataService = RecipeDataService(urlString: Constants.functionalURLString)
         let vm = HomeViewModel(dataService: dataService, cacheService: CacheService())
         await vm.fetchRecipes()
         #expect(vm.showAlert == false)
     }
     
     @Test func alertMessageIsNotBlank() async {
-        dataService.testingStatus = .returnError
+        let dataService = RecipeDataService(urlString: Constants.urlStringWithError)
         let vm = HomeViewModel(dataService: dataService, cacheService: CacheService())
         await vm.fetchRecipes()
         #expect(vm.alertMessage != "")
     }
     
     @Test func alertMessageIsBlank() async {
-        dataService.testingStatus = .functional
+        let dataService = RecipeDataService(urlString: Constants.functionalURLString)
         let vm = HomeViewModel(dataService: dataService, cacheService: CacheService())
         await vm.fetchRecipes()
         #expect(vm.alertMessage == "")
     }
     
     @Test func recipesAreUpdated() async {
-        dataService.testingStatus = .functional
+        let dataService = RecipeDataService(urlString: Constants.functionalURLString)
         let vm = HomeViewModel(dataService: dataService, cacheService: CacheService())
         await vm.fetchRecipes()
         #expect(!vm.recipes.isEmpty)

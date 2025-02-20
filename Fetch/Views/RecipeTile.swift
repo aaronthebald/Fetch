@@ -10,8 +10,8 @@ import SwiftUI
 struct RecipeTile: View {
     @ObservedObject var vm: HomeViewModel
     let recipe: Recipe
-    @State var uiImage: UIImage?
-    @State var failedToLoad: Bool = false
+    @State private var uiImage: UIImage?
+    @State private var failedToLoad: Bool = false
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -48,7 +48,7 @@ struct RecipeTile: View {
 }
 
 #Preview {
-    RecipeTile(vm: HomeViewModel(dataService: RecipeDataService(), cacheService: CacheService()), recipe: Recipe(cuisine: "American", name: "Banana Pancakes", id: UUID().uuidString, photoURLLarge: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/large.jpg", photoURLSmall: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/small.jpg", sourceURL: "https://www.bbcgoodfood.com/recipes/banana-pancakes", youtubeURL: "https://www.youtube.com/watch?v=kSKtb2Sv-_U"))
+    RecipeTile(vm: HomeViewModel(dataService: RecipeDataService(urlString: Constants.functionalURLString), cacheService: CacheService()), recipe: Recipe(cuisine: "American", name: "Banana Pancakes", id: UUID().uuidString, photoURLLarge: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/large.jpg", photoURLSmall: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/small.jpg", sourceURL: "https://www.bbcgoodfood.com/recipes/banana-pancakes", youtubeURL: "https://www.youtube.com/watch?v=kSKtb2Sv-_U"))
 }
 
 extension RecipeTile {

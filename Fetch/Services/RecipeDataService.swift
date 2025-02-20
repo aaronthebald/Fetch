@@ -8,13 +8,14 @@
 import Foundation
 
 class RecipeDataService: RecipeDataServiceProtocol {
-    private let urlString = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
-    private let urlStringWithError = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-"
-    private let urlStringWithEmptyResults = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json"
+    
+    let urlString: String
+    
+    init(urlString: String) {
+        self.urlString = urlString
+    }
+    
     private let jsonDecoder = JSONDecoder()
-    
-    var testingStatus: TestingStatus = .functional
-    
     
     func fetchAllRecipes() async throws -> [Recipe] {
         
@@ -22,7 +23,9 @@ class RecipeDataService: RecipeDataServiceProtocol {
             let url = try getAllRecipesURL()
             let (data, responseCode) = try await URLSession.shared.data(from: url)
             
-            guard (responseCode as? HTTPURLResponse)?.statusCode == 200 else {
+            guard
+                let status = (responseCode as? HTTPURLResponse)?.statusCode,
+                status >= 200 && status < 300 else {
                 print("The response code from the server was invalid")
                 throw RecipeDataServiceErrors.invalidResponseCode
             }
@@ -40,7 +43,10 @@ class RecipeDataService: RecipeDataServiceProtocol {
         do {
             let url = try getImageURL(imageURL: imageURL)
             let (data, responseCode) = try await URLSession.shared.data(from: url)
-            guard (responseCode as? HTTPURLResponse)?.statusCode == 200 else {
+            
+            guard
+                let status = (responseCode as? HTTPURLResponse)?.statusCode,
+                status >= 200 && status < 300 else {
                 print("The response code from the server was invalid")
                 throw RecipeDataServiceErrors.invalidResponseCode
             }
@@ -50,8 +56,7 @@ class RecipeDataService: RecipeDataServiceProtocol {
         }
     }
     
-    func getAllRecipesURL() throws -> URL {
-        let urlString = getAllRecipesURLString()
+    internal func getAllRecipesURL() throws -> URL {
         guard let url = URL(string: urlString) else {
             print("Failed to create url from urlString: \(urlString)")
             throw RecipeDataServiceErrors.failedToCreateURL
@@ -59,51 +64,11 @@ class RecipeDataService: RecipeDataServiceProtocol {
         return url
     }
     
-    func getImageURL(imageURL: String) throws -> URL {
-        let urlString = getImageURLString(urlString: imageURL)
-        guard let url = URL(string: urlString) else {
+    internal func getImageURL(imageURL: String) throws -> URL {
+        guard let url = URL(string: imageURL) else {
             print("Failed to create url from imageURL: \(urlString)")
             throw RecipeDataServiceErrors.failedToCreateURL
         }
         return url
     }
-    
-    func getAllRecipesURLString() -> String {
-        switch testingStatus {
-        case .functional:
-            return urlString
-        case .returnError:
-            return urlStringWithError
-        case .returnEmpty:
-            return urlStringWithEmptyResults
-        case .returnInvalidURL:
-            return ""
-        }
-    }
-    
-    func getImageURLString(urlString: String) -> String {
-        switch testingStatus {
-        case .functional:
-            return urlString
-        case .returnError:
-            return urlString
-        case .returnEmpty:
-            return urlString
-        case .returnInvalidURL:
-            return ""
-        }
-    }
-    
-    enum RecipeDataServiceErrors: Error {
-        case failedToCreateURL
-        case invalidResponseCode
-    }
-    
-    enum TestingStatus {
-        case functional
-        case returnError
-        case returnEmpty
-        case returnInvalidURL
-    }
-    
 }
