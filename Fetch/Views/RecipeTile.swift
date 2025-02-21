@@ -7,10 +7,13 @@
 
 import SwiftUI
 
+/// View to display Recipe
 struct RecipeTile: View {
     @ObservedObject var vm: HomeViewModel
     let recipe: Recipe
+    /// Optional UIImage that is created if the HomeViewModel successfully fetches Image Data.
     @State private var uiImage: UIImage?
+    /// If an error is caught when trying to fetch Image Data, property is set to true and a placeholder image is shown.
     @State private var failedToLoad: Bool = false
     
     var body: some View {
@@ -21,7 +24,9 @@ struct RecipeTile: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .overlay(alignment: .topTrailing, content: {
-                            infoSection
+                            if linksAvailable() {
+                                infoSection
+                            }
                         })
                         .overlay(alignment: .topLeading) {
                             recipeCuisine
@@ -52,6 +57,7 @@ struct RecipeTile: View {
 }
 
 extension RecipeTile {
+    /// Menu to display links to the **Recipe** YouTube video or Source website.
     var infoSection: some View {
         Menu {
             if let youtubeURL = recipe.youtubeURL,
@@ -93,13 +99,16 @@ extension RecipeTile {
         
     }
     
+    /// Placeholder image in case the image fails to download.
     var failedToLoadImageView: some View {
         VStack(alignment: .leading) {
             Image(systemName: "photo.badge.exclamationmark")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .overlay(alignment: .topTrailing, content: {
-                    infoSection
+                    if linksAvailable() {
+                        infoSection
+                    }
                 })
                 .overlay(alignment: .topLeading) {
                     recipeCuisine
@@ -133,6 +142,10 @@ extension RecipeTile {
             }
     }
     
+    /// ## Overview:
+    /// Function first attempts to unwrap the photoURLLarge property of **recipe**.
+    /// If photoURLLarge is nil, the function attempts to unwrap the photoURLSmall property of **recipe**
+    /// When a URL String is unwrapped the **fetchImage(urlString: String)** function is called
     func loadImage() {
         if let urlString = recipe.photoURLLarge {
             fetchImage(urlString: urlString)
@@ -143,10 +156,14 @@ extension RecipeTile {
         }
     }
     
+    /// Function attempts to fetch Image Data from the **HomeViewModel**
+    /// ## Fail State:
+    /// If an error is caught **failedToLoad** is set to true.
+    /// - Parameter urlString: The String associated with the image.
     func fetchImage(urlString: String) {
         Task {
             do {
-                let data = try await vm.fetchImageData(imageURL: urlString, name: recipe.name)
+                let data = try await vm.fetchImageData(imageURL: urlString)
                 uiImage = UIImage(data: data)
             } catch {
                 failedToLoad = true
@@ -154,6 +171,11 @@ extension RecipeTile {
         }
     }
     
+    /// Convenience function to determine if the **Recipe** object passed into the view has a valid photoURL property.
+    /// ## Overview:
+    /// If the **Recipe** object does not have a valid photoURL , **failedToLoad** is set to true and a value of false is returned.
+    /// If the **Recipe** *does* have a valid photoURL then a value of true is returned.
+    /// - Returns: Bool
     func photoURLStringsHaveValue() -> Bool {
         if (recipe.photoURLLarge == nil || recipe.photoURLLarge == "") && (recipe.photoURLSmall == nil || recipe.photoURLSmall == "") {
             failedToLoad = true
@@ -161,5 +183,18 @@ extension RecipeTile {
         } else {
             return true
         }
+    }
+    
+    /// Convenience function to determine if the **Recipe** object passed into the view has a valid YouTube or Source URL String.
+    /// ## Overview:
+    /// If the **Recipe** object does not have a valid YouTube or Source URL String a value of false is returned.
+    /// If the **Recipe** *does* have a valid YouTube or Source URL String then a value of true is returned.
+    /// - Returns: Bool
+    func linksAvailable() -> Bool {
+       if (recipe.youtubeURL == nil || recipe.youtubeURL == "") && (recipe.sourceURL == nil || recipe.sourceURL == "") {
+            return false
+       } else {
+           return true
+       }
     }
 }

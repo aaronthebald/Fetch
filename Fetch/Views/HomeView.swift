@@ -8,7 +8,10 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject private var vm = HomeViewModel(dataService: RecipeDataService(urlString: Constants.functionalURLString), cacheService: CacheService())
+    @StateObject private var vm = HomeViewModel(
+        dataService: RecipeDataService(urlString: Constants.functionalURLString),
+        cacheService: CacheService()
+    )
     
     var body: some View {
         NavigationStack {
