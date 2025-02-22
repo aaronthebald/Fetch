@@ -2,7 +2,7 @@
 
 ## Summary: 
 The assignment was to build a modern, efficient, iOS App to download and display recipes with the provided API. I believe I have done just that. 
-The UI was built with SwiftUI, asynchronous tasks were handles with async/await, Images were saved to an instance of NSCache, and unit tests were written with the modern Swift Testing framework. 
+The UI was built with SwiftUI, asynchronous tasks were handled with async/await, Images were saved to an instance of NSCache, and unit tests were written with the modern Swift Testing framework. 
 
 https://github.com/user-attachments/assets/00312878-09fc-4a5f-be15-9277f00a4e00
 
